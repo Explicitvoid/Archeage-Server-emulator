@@ -43,22 +43,23 @@ namespace ArcheAgeLogin.ArcheAge.Holders
         public static uint MaxCharacterUid()
         {
             uint uid = 0;
-            using (MySqlConnection conn = new MySqlConnection(Settings.Default.DataBaseConnectionString))
+            using (var conn = new MySqlConnection(Settings.Default.DataBaseConnectionString))
             {
                 try
                 {
                     conn.Open();
-                    MySqlCommand command = new MySqlCommand("SELECT * FROM `character_records`", conn);
-                    MySqlDataReader reader = command.ExecuteReader();
-                    while (reader.Read())
+                    var command = new MySqlCommand("SELECT `characterid` FROM `character_records`", conn);
+                    var reader = command.ExecuteReader();
+                    if (!reader.Read()) { return uid; }
+                    do
                     {
-                        Character character = new Character();
+                        var character = new Character();
                         character.CharacterId = reader.GetUInt32("characterid");
                         if (uid < character.CharacterId)
                         {
                             uid = character.CharacterId;
                         }
-                    }
+                    } while (reader.Read());
                     command.Dispose();
                     reader.Close();
                 }
@@ -80,17 +81,17 @@ namespace ArcheAgeLogin.ArcheAge.Holders
         public static int LoadCharacterData(long accountId)
         {
             m_DbCharacters = new List<Character>();
-            using (MySqlConnection con = new MySqlConnection(Settings.Default.DataBaseConnectionString))
+            using (var con = new MySqlConnection(Settings.Default.DataBaseConnectionString))
             {
                 try
                 {
                     con.Open();
-                    MySqlCommand command =
+                    var command =
                         new MySqlCommand("SELECT * FROM `character_records` WHERE `accountid` = '" + accountId + "'", con);
-                    MySqlDataReader reader = command.ExecuteReader();
+                    var reader = command.ExecuteReader();
                     while (reader.Read())
                     {
-                        Character character = new Character();
+                        var character = new Character();
                         character.CharacterId = reader.GetUInt32("characterid");
                         character.AccountId = reader.GetUInt32("accountid");
                         character.WorldId = reader.GetByte("worldid");
@@ -139,16 +140,16 @@ namespace ArcheAgeLogin.ArcheAge.Holders
         public static void LoadCharacterData()
         {
             m_DbCharacters = new List<Character>();
-            using (MySqlConnection con = new MySqlConnection(Settings.Default.DataBaseConnectionString))
+            using (var con = new MySqlConnection(Settings.Default.DataBaseConnectionString))
             {
                 try
                 {
                     con.Open();
-                    MySqlCommand command = new MySqlCommand("SELECT * FROM `character_records`", con);
-                    MySqlDataReader reader = command.ExecuteReader();
+                    var command = new MySqlCommand("SELECT * FROM `character_records`", con);
+                    var reader = command.ExecuteReader();
                     while (reader.Read())
                     {
-                        Character character = new Character();
+                        var character = new Character();
 
                         character.CharacterId = reader.GetUInt32("characterid");
                         character.AccountId = reader.GetUInt32("accountid");
